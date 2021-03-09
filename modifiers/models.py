@@ -14,6 +14,11 @@ class ModOptions(EmbeddedDocument):
     price = FloatField(required=True)
 
 
+class Hotel(models.Model):
+    name = models.CharField(max_length=50)
+    hotel_Main_Img = models.ImageField(upload_to='images/')
+
+
 class Modifiers(Document):
     name = StringField(max_length=1024, required=True)
     options = ListField(EmbeddedDocumentField(ModOptions))
@@ -45,19 +50,19 @@ class Items(Document):
     active = IntField()
     stock = IntField()
     option_groups = ListField(ReferenceField(OptionGroups))
+    options = ListField(ReferenceField(Options))
     max_allowed = IntField()
     min_required = IntField()
     price_default = FloatField()
     display_order = IntField()
 
 
-class Address(EmbeddedDocument
-):
+class Address(EmbeddedDocument):
     address1 = StringField(max_length=100, required=True)
     apt_bldg = StringField(max_length=1000)
     city = StringField(max_length=1000)
-    state = StringField(max_length=100)
-    zip = StringField(max_length=8)
+    state = StringField(max_length=1000)
+    zip = StringField(max_length=1000)
 
 
 class Timings(EmbeddedDocument):
@@ -66,13 +71,13 @@ class Timings(EmbeddedDocument):
 
 
 class Days(EmbeddedDocument):
-    Monday = EmbeddedDocumentField(Timings)
-    Tuesday = EmbeddedDocumentField(Timings)
-    Wednesday = EmbeddedDocumentField(Timings)
-    Thursday = EmbeddedDocumentField(Timings)
-    Friday = EmbeddedDocumentField(Timings)
-    Saturday = EmbeddedDocumentField(Timings)
-    Sunday = EmbeddedDocumentField(Timings)
+    Monday = ListField(EmbeddedDocumentField(Timings))
+    Tuesday = ListField(EmbeddedDocumentField(Timings))
+    Wednesday = ListField(EmbeddedDocumentField(Timings))
+    Thursday = ListField(EmbeddedDocumentField(Timings))
+    Friday = ListField(EmbeddedDocumentField(Timings))
+    Saturday = ListField(EmbeddedDocumentField(Timings))
+    Sunday = ListField(EmbeddedDocumentField(Timings))
 
 
 class SpecialHours(EmbeddedDocument):
@@ -96,8 +101,8 @@ class Stores(Document):
 
 
 class Phone(EmbeddedDocument):
-    cell = StringField(max_length=12)
-    other = StringField(max_length=12)
+    cell = StringField(max_length=1000)
+    other = StringField(max_length=1000)
 
 
 class Customer(Document):
@@ -107,13 +112,13 @@ class Customer(Document):
     phone = ListField(EmbeddedDocumentField(Phone))
     email = StringField(max_length=1000)
 
-class OrderItems(Document):
+
+class OrderItems(EmbeddedDocument):
     name = StringField(max_length=1000)
     size = StringField(max_length=1000)
     quantity = IntField()
     price = IntField()
     side = StringField(max_length=1000)
-    options = ListField(ReferenceField(Options))
 
 
 class Orders(Document):
@@ -128,7 +133,7 @@ class Orders(Document):
     tax = IntField()
     discount = IntField()
     total_price = IntField()
-    items = ListField(ReferenceField(OrderItems))
+    items = ListField(EmbeddedDocumentField(OrderItems))
 
 
 
