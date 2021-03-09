@@ -21,10 +21,10 @@ class Modifiers(Document):
 
 class Options(Document):
     name = StringField(max_length=100, required=True)
-    description = StringField(max_length=1000)
+    description = StringField(max_length=1000, blank=True)
     price = FloatField(required=True)
     modifiers = ListField(ReferenceField('Modifiers'))
-
+    type = StringField(max_length=100, blank=True)
 
 class OptionGroups(Document):
     name = StringField(max_length=100, required=True)
@@ -45,10 +45,7 @@ class Items(Document):
     active = IntField()
     stock = IntField()
     option_groups = ListField(ReferenceField(OptionGroups))
-    max_allowed = IntField()
-    min_required = IntField()
-    price_default = FloatField()
-    display_order = IntField()
+    options = ListField(ReferenceField(Options))
 
 
 class Address(EmbeddedDocument

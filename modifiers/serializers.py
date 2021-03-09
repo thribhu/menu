@@ -2,7 +2,7 @@ import io
 from mongoengine import fields
 from rest_framework_mongoengine import serializers as MongoSerializer
 from rest_framework import serializers
-from .models import Modifiers, Options, OptionGroups
+from .models import Modifiers, Options, OptionGroups, Items
 from rest_framework.parsers import JSONParser
 
 
@@ -21,34 +21,34 @@ class OptionsSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = Options
         fields = "__all__"
+    def to_representation(self, instance):
+        data = super().to_representation(instance)
+        if not data['description']:
+            data['description'] = ''
+        if not data['type']:
+            data['type'] = ''
+        return data
 
-    # def create(self, validated_data):
-    #     modifiers = validated_data.pop('modifiers')
-    #     instance = Options.objects.create(**validated_data)
-    #     instance.modifiers = [Options.objects.get(pk=option) for option in modifiers]
-    #     instance.save()
-    #     return instance
 
-
-class OptionGroupSerialzer(MongoSerializer.DocumentSerializer):
+class OptionGroupSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = OptionGroups
         fields = '__all__'
 
 
-class ItemsSerialzer(MongoSerializer.DocumentSerializer):
+class ItemsSerializer(MongoSerializer.DocumentSerializer):
+    class Meta:
+        model = Items
+        fields = '__all__'
+
+
+class StoresSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = OptionGroups
         fields = '__all__'
 
 
-class StoresSerialzer(MongoSerializer.DocumentSerializer):
-    class Meta:
-        model = OptionGroups
-        fields = '__all__'
-
-
-class OrdersSerialzer(MongoSerializer.DocumentSerializer):
+class OrdersSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = OptionGroups
         fields = '__all__'
