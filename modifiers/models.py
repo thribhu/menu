@@ -16,7 +16,7 @@ class ModOptions(EmbeddedDocument):
 
 class Modifiers(Document):
     name = StringField(max_length=1024, required=True)
-    options = ListField(EmbeddedDocumentField(ModOptions))
+    options = ListField(EmbeddedDocumentField('ModOptions'))
 
 
 class Options(Document):
@@ -28,12 +28,12 @@ class Options(Document):
 
 class OptionGroups(Document):
     name = StringField(max_length=100, required=True)
-    description = StringField(max_length=1000)
+    description = StringField(max_length=1000, default=None)
     default_order = IntField()
     min_required = IntField()
     price_default = FloatField()
     max_allowed = IntField()
-    options = ListField(ReferenceField(Options))
+    options = ListField(ReferenceField('Options'))
 
 
 class Items(Document):
@@ -44,8 +44,8 @@ class Items(Document):
     price = FloatField()
     active = IntField()
     stock = IntField()
-    option_groups = ListField(ReferenceField(OptionGroups))
-    options = ListField(ReferenceField(Options))
+    option_groups = ListField(ReferenceField("OptionGroups"))
+    options = ListField(ReferenceField("Options"))
 
 
 class Address(EmbeddedDocument
@@ -89,7 +89,7 @@ class Stores(Document):
     contact_phone = StringField(max_length=1000)
     hours = ListField(EmbeddedDocumentField(Days))
     tax = IntField()
-    special_hours = ListField(EmbeddedDocumentField(SpecialHours))
+    special_hours = ListField(EmbeddedDocumentField("SpecialHours"))
 
 
 class Phone(EmbeddedDocument):
@@ -110,13 +110,13 @@ class OrderItems(Document):
     quantity = IntField()
     price = IntField()
     side = StringField(max_length=1000)
-    options = ListField(ReferenceField(Options))
+    options = ListField(ReferenceField("Options"))
 
 
 class Orders(Document):
     number = StringField(max_length=1000)
     date = StringField(max_length=1000)
-    customer = ListField(ReferenceField(Customer))
+    customer = ListField(ReferenceField("Customer"))
     type = StringField(max_length=1000)
     total_items = IntField()
     payment = StringField(max_length=1000)

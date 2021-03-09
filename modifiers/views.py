@@ -76,7 +76,6 @@ class OptionsViewSet(ModelViewSet):
 
     def put(self, update_data):
         # do things...
-        print('hi')
         option_update = Options.objects.get(pk=update_data)
         option_data = JSONParser().parse(request)
         option_serializer = OptionsSerializer(option_update, data=option_data)
