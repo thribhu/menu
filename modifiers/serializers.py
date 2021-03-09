@@ -2,7 +2,7 @@ import io
 from mongoengine import fields
 from rest_framework_mongoengine import serializers as MongoSerializer
 from rest_framework import serializers
-from .models import Modifiers, Options, OptionGroups
+from .models import Modifiers, Options, OptionGroups, Items
 from rest_framework.parsers import JSONParser
 
 
@@ -30,25 +30,25 @@ class OptionsSerializer(MongoSerializer.DocumentSerializer):
     #     return instance
 
 
-class OptionGroupSerialzer(MongoSerializer.DocumentSerializer):
+class OptionGroupSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = OptionGroups
         fields = '__all__'
 
 
-class ItemsSerialzer(MongoSerializer.DocumentSerializer):
+class ItemsSerializer(MongoSerializer.DocumentSerializer):
+    class Meta:
+        model = Items
+        fields = '__all__'
+
+
+class StoresSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = OptionGroups
         fields = '__all__'
 
 
-class StoresSerialzer(MongoSerializer.DocumentSerializer):
-    class Meta:
-        model = OptionGroups
-        fields = '__all__'
-
-
-class OrdersSerialzer(MongoSerializer.DocumentSerializer):
+class OrdersSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = OptionGroups
         fields = '__all__'
