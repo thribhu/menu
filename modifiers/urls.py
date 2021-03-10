@@ -1,4 +1,4 @@
-from .views import OrdersViewSet, ModifierViewSet, OptionsViewSet, OptionGroupViewSet, ItemsViewSet, StoresViewSet
+from .views import ModifierViewSet, OptionsViewSet, OptionGroupViewSet, ItemsViewSet, StoresViewSet, OrdersViewSet
 from django.urls import path, include
 from rest_framework_mongoengine.routers import DefaultRouter
 router = DefaultRouter()
