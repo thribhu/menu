@@ -50,6 +50,8 @@ class OptionsViewSet(ModelViewSet):
 
     def get_queryset(self):
         option_data = Options.objects.all()
+        return option_data
+    '''
         for i in option_data:
             name_list = []
             if i['modifiers']:
@@ -60,11 +62,13 @@ class OptionsViewSet(ModelViewSet):
                     name_list.append(y['name'])
                 i['modifiers'] = name_list
         return option_data
-
+    '''
+    '''
     def get(self, pk):
         option = Options.objects.get(pk=pk)
         option_serializer = OptionsSerializer(option)
         return JsonResponse(option_serializer.data)
+    '''
 
     def post(self, update_data):
         option_data = JSONParser().parse(request)
@@ -78,6 +82,7 @@ class OptionsViewSet(ModelViewSet):
         # do things...
         option_update = Options.objects.get(pk=update_data)
         option_data = JSONParser().parse(request)
+        print(option_data)
         option_serializer = OptionsSerializer(option_update, data=option_data)
         if option_serializer.is_valid():
             option_serializer.save()
@@ -96,6 +101,7 @@ class OptionGroupViewSet(ModelViewSet):
 
     def get_queryset(self):
         group_data = OptionGroups.objects.all()
+        '''
         for i in group_data:
             name_list = []
             if i['options']:
@@ -105,8 +111,11 @@ class OptionGroupViewSet(ModelViewSet):
                     y = option_serializer.data
                     name_list.append(y['name'])
                 i['options'] = name_list
+        '''
         return group_data
+        
 
+    '''
     def get(self, id):
         group = OptionGroups.objects.get(pk=id)
         name_list = []
@@ -118,6 +127,7 @@ class OptionGroupViewSet(ModelViewSet):
                 name_list.append(y['name'])
             group['options'] = name_list
         return group
+    '''
     def post(self, update_data):
         group_data = JSONParser().parse(request)
         group_serializer = OptionGroupSerializer(data=group_data)
