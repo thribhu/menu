@@ -146,31 +146,8 @@ class ItemsViewSet(ModelViewSet):
     queryset = Items.objects.all()
     serializer_class = ItemsSerializer
     def get_queryset(self):
-        item_data = Items.objects.all()
-        for i in item_data:
-            name_list = []
-            group_list = []
-            if i['options']:
-                print(type(i))
-                for j in i['options']:
-                    option = Options.objects.get(pk=j['id'])
-                    option_serializer = OptionsSerializer(option)
-                    y = option_serializer.data
-                    name_list.append(y['name'])
-            i['options'] = name_list
-        '''
-        p> " 'Q' in normal mode enters Ex mode. You almost never want this.
-        irint(name_list)
-        if i['option_groups']:
-            for j in i['option_groups']:
-                    group = OptionGroups.objects.get(pk=j['id'])
-                    group_serializer = OptionGroupSerializer(group)
-                    data = group_serializer.data
-                    group_list.append(data)
-            '''
-            i['options'] = name_list
-            #i['option_groups'] = group_list
-        return item_data
+        items = Items.objects.all()
+        return items
 
 
     def post(self, update_data):
