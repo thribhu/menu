@@ -3,7 +3,8 @@ from rest_framework import status, permissions, generics
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework_mongoengine.viewsets import ModelViewSet
-from .serializers import ModifierSerializer, OptionsSerializer, OptionGroupSerializer, OrdersSerializer, StoresSerializer, \
+from .serializers import ModifierSerializer, OptionsSerializer, OptionGroupSerializer, OrdersSerializer, \
+    StoresSerializer, \
     ItemsSerializer
 from .models import Modifiers, Options, OptionGroups, Items, Stores, Orders
 from rest_framework.decorators import api_view
@@ -51,6 +52,7 @@ class OptionsViewSet(ModelViewSet):
     def get_queryset(self):
         option_data = Options.objects.all()
         return option_data
+
     '''
         for i in option_data:
             name_list = []
@@ -91,8 +93,14 @@ class OptionsViewSet(ModelViewSet):
 
     def delete(self, update_data):
         option = Options.objects.get(pk=update_data)
-        option.delete()
-        return JsonResponse({'message': 'Group was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+        try:
+            if update_data['is_used']:
+                return JsonResponse({'message': 'Option is being used!'}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                option.delete()
+                return JsonResponse({'message': 'Option was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+        except:
+            return JsonResponse({'message': 'Delete was not possible'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class OptionGroupViewSet(ModelViewSet):
@@ -113,7 +121,6 @@ class OptionGroupViewSet(ModelViewSet):
                 i['options'] = name_list
         '''
         return group_data
-        
 
     '''
     def get(self, id):
@@ -128,9 +135,19 @@ class OptionGroupViewSet(ModelViewSet):
             group['options'] = name_list
         return group
     '''
+
     def post(self, update_data):
         group_data = JSONParser().parse(request)
         group_serializer = OptionGroupSerializer(data=group_data)
+        for i in group_data['options']:
+            for k in i:
+                option_update = Options.objects.get(pk=k["id"])
+                option_update['is_used'] = True
+                option_update['is_use_counter'] = option_update['is_use_counter'] + 1
+                option_serializer = OptionsSerializer(data=option_update)
+                if option_serializer.is_valid():
+                    option_serializer.save()
+
         if group_serializer.is_valid():
             group_serializer.save()
             return JsonResponse(group_serializer.validated_data, status=status.HTTP_201_CREATED)
@@ -148,21 +165,54 @@ class OptionGroupViewSet(ModelViewSet):
 
     def delete(self, update_data):
         group = OptionGroups.objects.get(pk=update_data)
-        group.delete()
-        return JsonResponse({'message': 'Group was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+        for i in update_data:
+            for k in i['options']:
+                option_update = Options.objects.get(pk=k["id"])
+                option_update['is_use_counter'] = option_update['is_use_counter'] - 1
+                if option_update['is_use_counter'] == 0:
+                    option_update['is_used'] = False
+                option_serializer = OptionsSerializer(option_update)
+                if option_serializer.is_valid():
+                    option_serializer.save()
+        try:
+            if update_data['is_used']:
+                return JsonResponse({'message': 'Group is being used!'}, status=status.HTTP_204_NO_CONTENT)
+            else:
+                group.delete()
+                return JsonResponse({'message': 'Group was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
+        except:
+            return JsonResponse({'message': 'Delete was not possible'}, status=status.HTTP_204_NO_CONTENT)
 
 
 class ItemsViewSet(ModelViewSet):
     queryset = Items.objects.all()
     serializer_class = ItemsSerializer
+
     def get_queryset(self):
         items = Items.objects.all()
         return items
 
-
     def post(self, update_data):
         item_data = JSONParser().parse(request)
         item_serializer = ItemsSerializer(data=item_data)
+        for i in update_data:
+            if i['option_groups']:
+                for j in i['option_groups']:
+                    group_update = Options.objects.get(pk=j["id"])
+                    group_update['is_used'] = True
+                    group_update['is_use_counter'] = group_update['is_use_counter'] + 1
+                    group_serializer = OptionGroupSerializer(data=group_update)
+                    if group_serializer.is_valid():
+                        group_serializer.save()
+                    if j['options']:
+                        for k in j['options']:
+                            option_update = Options.objects.get(pk=k["id"])
+                            option_update['is_used'] = True
+                            option_update['is_use_counter'] = option_update['is_use_counter'] + 1
+                            option_serializer = OptionsSerializer(data=option_update)
+                            if option_serializer.is_valid():
+                                option_serializer.save()
+
         if item_serializer.is_valid():
             item_serializer.save()
             return JsonResponse(item_serializer.validated_data, status=status.HTTP_201_CREATED)
@@ -179,8 +229,27 @@ class ItemsViewSet(ModelViewSet):
         return JsonResponse(item_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
     def delete(self, update_data):
-        group = Items.objects.get(pk=update_data)
-        group.delete()
+        item = Items.objects.get(pk=update_data)
+        for i in update_data:
+            if i['option_groups']:
+                for j in i['option_groups']:
+                    group_update = Options.objects.get(pk=j["id"])
+                    group_update['is_use_counter'] = group_update['is_use_counter'] - 1
+                    if group_update['is_use_counter'] == 0:
+                        group_update['is_used'] = False
+                    group_serializer = OptionGroupSerializer(data=group_update)
+                    if group_serializer.is_valid():
+                        group_serializer.save()
+                    if j['options']:
+                        for k in j['options']:
+                            option_update = Options.objects.get(pk=k["id"])
+                            option_update['is_use_counter'] = option_update['is_use_counter'] - 1
+                            if option_update['is_use_counter'] == 0:
+                                option_update['is_used'] = False
+                            option_serializer = OptionsSerializer(option_update)
+                            if option_serializer.is_valid():
+                                option_serializer.save()
+        item.delete()
         return JsonResponse({'message': 'Item was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
 
 
@@ -238,6 +307,3 @@ class OrdersViewSet(ModelViewSet):
         order = Orders.objects.get(pk=update_data)
         order.delete()
         return JsonResponse({'message': 'Group was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
-
-
-
