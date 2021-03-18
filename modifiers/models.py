@@ -17,6 +17,8 @@ class ModOptions(EmbeddedDocument):
 class Modifiers(Document):
     name = StringField(max_length=1024, required=True)
     options = ListField(EmbeddedDocumentField('ModOptions'))
+    is_used = BooleanField(default=False)
+    is_used_counter = IntField(default=0)
 
 
 class Options(Document):
@@ -24,7 +26,10 @@ class Options(Document):
     description = StringField(max_length=1000, blank=True)
     price = FloatField(required=True)
     modifiers = ListField(ReferenceField('Modifiers'))
-    type = StringField(max_length=100, blank=True)
+    type = StringField(max_length=100, blank=False)
+    is_used = BooleanField(default=False)
+    is_used_counter = IntField(default=0)
+
 
 class OptionGroups(Document):
     name = StringField(max_length=100, required=True)
@@ -34,6 +39,8 @@ class OptionGroups(Document):
     price_default = FloatField()
     max_allowed = IntField()
     options = ListField(ReferenceField('Options'))
+    is_used = BooleanField(default=False)
+    is_used_counter = IntField(default=0)
 
 
 class Items(Document):
