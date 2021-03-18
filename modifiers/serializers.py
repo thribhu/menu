@@ -22,11 +22,13 @@ class OptionsSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = Options
         fields = [
+                "id",
                 "name",
                 "description",
                 "price",
                 "modifiers",
                 "type"
+
                 ]
     def to_representation(self, instance):
         data = super().to_representation(instance)
@@ -36,7 +38,7 @@ class OptionsSerializer(MongoSerializer.DocumentSerializer):
             data['type'] = ''
         return data
     def update(self, instance, validated_data):
-        print(validated_data)
+        print('data', validated_data)
         modifiers_data = validated_data.pop("modifiers")
         modifiers = instance.modifiers
 
