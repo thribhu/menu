@@ -68,8 +68,12 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'menu.wsgi.application'
 
+
+WSGI_APPLICATION = 'menu.wsgi.application'
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler'
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases

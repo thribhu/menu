@@ -1,7 +1,7 @@
 from mongoengine import *
 
 from mongoengine.document import Document, EmbeddedDocument
-from mongoengine.fields import EmbeddedDocumentField, FloatField, ImageField, IntField, ListField, StringField, \
+from mongoengine.fields import BooleanField, EmbeddedDocumentField, FloatField, IntField, ListField, StringField, \
     ReferenceField
 # from django.db import models
 # from django.contrib.postgres.fields import JSONField
@@ -30,6 +30,17 @@ class Options(Document):
     is_used = BooleanField(default=False)
     is_used_counter = IntField(default=0)
 
+    def __str__(self) -> str:
+        return self
+    
+    """
+    Options Update modifiers
+    Arguments: *args
+        modifiers list
+    Returns:
+        [status]: [number]
+    """
+        
 
 class OptionGroups(Document):
     name = StringField(max_length=100, required=True)
