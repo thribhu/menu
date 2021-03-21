@@ -19,15 +19,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.1/howto/deployment/checklist/
-
-# SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = '!^1i=08^54atpbt#(d&^dp8zy$f3v7_zgkn=n&fb##c2ujx!d9'
+
+ALLOWED_HOSTS = ['*']
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
-
-ALLOWED_HOSTS = []
-
 
 # Application definition
 
@@ -38,10 +35,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'corsheaders',
     'modifiers'
 ]
 
 MIDDLEWARE = [
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -69,17 +68,21 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'menu.wsgi.application'
 
+
+WSGI_APPLICATION = 'menu.wsgi.application'
+REST_FRAMEWORK = {
+    'EXCEPTION_HANDLER': 'rest_framework.views.exception_handler'
+}
 
 # Database
 # https://docs.djangoproject.com/en/3.1/ref/settings/#databases
 
 DATABASES = {
-    'default': {
-        'ENGINE': '',
-    }
-}
+      'default': {
+          'ENGINE': '',
+      }
+  }
 
 
 # Password validation
@@ -114,7 +117,9 @@ USE_L10N = True
 
 USE_TZ = True
 
-
+CORS_ORIGIN_WHITELIST = [
+        'http://localhost:3000',
+]
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/3.1/howto/static-files/
 
