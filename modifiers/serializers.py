@@ -11,7 +11,7 @@ class ModifierSerializer(MongoSerializer.DocumentSerializer):
         fields = ('id', 'name', 'options')
         depth = 2
 class OptionsSerializer(MongoSerializer.DocumentSerializer):
-    modifiers = ModifierSerializer(many=True)
+    modifiers = ModifierSerializer(many=True, read_only=True)
     class Meta:
         model = Options
         fields = "__all__"
@@ -26,27 +26,23 @@ class OptionsSerializer(MongoSerializer.DocumentSerializer):
         print(validated_data)
         return super().update(instance, validated_data)
 class OptionGroupSerializer(MongoSerializer.DocumentSerializer):
+    options = OptionsSerializer(many=True)
     class Meta:
         model = OptionGroups
         fields = '__all__'
 
 
 class ItemsSerializer(MongoSerializer.DocumentSerializer):
-        model = Items
-        fields = [
-                "name",
-                "description",
-                "type",
-                "image_url",
-                "price",
-                "active",
-                "stock",
+        options = OptionsSerializer(many=True, read_only=True)
+        option_groups = OptionGroupSerializer(many=True, read_only=True)
+        class Meta:
+            model = Items
+            fields = [
+                "id",
+                "options",
                 "option_groups",
-                "options"
-                ]
-        depth = 3
-
-
+                "name"
+            ] 
 class StoresSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = OptionGroups

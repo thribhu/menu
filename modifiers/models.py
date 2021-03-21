@@ -19,7 +19,8 @@ class Modifiers(Document):
     options = ListField(EmbeddedDocumentField('ModOptions'))
     is_used = BooleanField(default=False)
     is_used_counter = IntField(default=0)
-
+    def __str__(self) -> str:
+        return self.name
 
 class Options(Document):
     name = StringField(max_length=100, required=True)
@@ -31,7 +32,7 @@ class Options(Document):
     is_used_counter = IntField(default=0)
 
     def __str__(self) -> str:
-        return self
+        return self.name
     
     """
     Options Update modifiers
@@ -45,14 +46,16 @@ class Options(Document):
 class OptionGroups(Document):
     name = StringField(max_length=100, required=True)
     description = StringField(max_length=1000, default=None)
-    default_order = IntField()
+    order = IntField()
     min_required = IntField()
-    price_default = FloatField()
+    price = FloatField()
     max_allowed = IntField()
     options = ListField(ReferenceField('Options'))
     is_used = BooleanField(default=False)
     is_used_counter = IntField(default=0)
-
+    
+    def __str__ (self):
+        return self.name
 
 class Items(Document):
     name = StringField(max_length=100, required=True)
