@@ -36,8 +36,11 @@ class OptionsViewSet(ModelViewSet):
     def update(self, request, *args, **kwargs):
         option = self.get_object()
         data = request.data
-        modifiers = Modifiers.objects.filter(id__in = data["modifiers"])
-        option.modifiers = modifiers
+        modifiers = data.pop('modifiers', None)
+        u_modifiers = []
+        for id in modifiers:
+            u_modifiers.append(Modifiers.objects.get(pk=id))
+        option.modifiers = u_modifiers
         option.name = data["name"]
         option.save()
         serializer = OptionsSerializer(option)
