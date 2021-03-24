@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/3.1/ref/settings/
 """
 
+import os
 from pathlib import Path
 from mongoengine import connect
 connect('menubuilder')
@@ -36,7 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'corsheaders',
-    'modifiers'
+    'modifiers',
+    'rest_framework'
 ]
 
 MIDDLEWARE = [
@@ -80,7 +82,8 @@ REST_FRAMEWORK = {
 
 DATABASES = {
       'default': {
-          'ENGINE': '',
+         'ENGINE' : 'django.db.backends.sqlite3',
+         'NAME': os.path.join(BASE_DIR, 'db.sqlite3'),
       }
   }
 
