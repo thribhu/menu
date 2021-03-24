@@ -36,9 +36,15 @@ class OptionsViewSet(ModelViewSet):
     def update(self, request, *args, **kwargs):
         option = self.get_object()
         data = request.data
-        modifiers = Modifiers.objects.filter(id__in = data["modifiers"])
-        option.modifiers = modifiers
-        option.name = data["name"]
+        modifiers = data.pop('modifiers', None)
+        u_modifiers = []
+        for id in modifiers:
+            u_modifiers.append(Modifiers.objects.get(pk=id))
+        option.modifiers = u_modifiers
+        option.name = data["name"] or option.name
+        option.type = data["type"] or option.type
+        option.description = data["description"] or option.description
+        option.image_url = data["image_url"] or option.image_url
         option.save()
         serializer = OptionsSerializer(option)
         return Response(serializer.data, status=status.HTTP_200_OK)
@@ -52,13 +58,14 @@ class OptionGroupViewSet(ModelViewSet):
         options = data.pop("options", None)
         group = OptionGroups(**data)
         group.save()
-        options = Options.objects.filter(id__in = options)
-        group.options = options
-        serializer = OptionGroupSerializer(data = group)
-        if (serializer.is_valid()):
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        else:
-            return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+        if options is not None:
+           u_options = [] 
+           for id in options:
+               u_options.append(Options.objects.get(id=id))
+               group.options = u_options
+               group.save()
+        serializer = OptionGroupSerializer(group)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     def update(self, request, *args, **kwargs):
         group = self.get_object()
         data = request.data
@@ -95,16 +102,17 @@ class ItemsViewSet(ModelViewSet):
         item.save()
         serializer = ItemsSerializer(item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
-    def update(self, request):
-        item_instance = self.get_objetc()
+    def update(self, request, *args, **kwargs):
+        item_instance = self.get_object()
         item = request.data
         options = item.pop('options', None)
         groups = item.pop('option_groups', None)
         item_instance.name = item["name"] or item_instance.name
-        item_instance.description = item["description"] or item_instance.description
-        item_instance.price = item["price"] or item_instance.price
-        item_instance.active = item["active"] or item_instance.active
-        item_instance.stock = item["stock"] or item_instance.stock
+        item_instance.description = item["description"] or item_instance["description"]
+        item_instance.price = item["price"] or item_instance["price"]
+        item_instance.active = item["active"] or item_instance["active"]
+        item_instance.stock = item["stock"] or item_instance["stock"]
+        item_instance.image_url = item["image_url"] or item_instance["image_url"]
         if options is not None:
             options = Options.objects.filter(id__in = options)
             item_instance.options = options
@@ -112,10 +120,8 @@ class ItemsViewSet(ModelViewSet):
             groups = OptionGroups.objects.filter(id__in = groups)
             item_instance.option_groups = groups
         item_instance.save()
-        serializer = ItemsSerializer(data = item_instance)
-        if serializer.is_valid():
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.error, status=status.HTTP_400_BAD_REQUEST)
+        serializer = ItemsSerializer( item_instance)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 class StoresViewSet(ModelViewSet):

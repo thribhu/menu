@@ -27,6 +27,7 @@ class Options(Document):
     description = StringField(max_length=1000, blank=True)
     price = FloatField(required=True)
     modifiers = ListField(ReferenceField('Modifiers'))
+    image_url = StringField(max_length=1000) 
     type = StringField(max_length=100, blank=False)
     is_used = BooleanField(default=False)
     is_used_counter = IntField(default=0)
