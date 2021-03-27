@@ -1,4 +1,5 @@
 from mongoengine import *
+from mongoengine import document
 
 from mongoengine.document import Document, EmbeddedDocument
 from mongoengine.fields import BooleanField, EmbeddedDocumentField, FloatField, IntField, ListField, StringField, \
@@ -8,7 +9,10 @@ from mongoengine.fields import BooleanField, EmbeddedDocumentField, FloatField, 
 #
 # from rest_framework import serializers, viewsets, response
 
-
+'''
+Signal: To increate the count of referenced model, signal will trigger after post_save
+'''
+from mongoengine import signals
 class ModOptions(EmbeddedDocument):
     name = StringField(max_length=100, required=True)
     price = FloatField(required=True)
@@ -32,17 +36,16 @@ class Options(Document):
     is_used = BooleanField(default=False)
     is_used_counter = IntField(default=0)
 
+    def __unicode__(self):
+        return self.name
     def __str__(self) -> str:
         return self.name
+
+    @classmethod
+    def post_save(cls, sender, doc, **kwargs):
+        if 'created' in kwargs:
+            print(document)
     
-    """
-    Options Update modifiers
-    Arguments: *args
-        modifiers list
-    Returns:
-        [status]: [number]
-    """
-        
 
 class OptionGroups(Document):
     name = StringField(max_length=100, required=True)
@@ -152,3 +155,4 @@ class Orders(Document):
 
 
 
+signals.post_save.connect(Options.post_save, sender=Options)

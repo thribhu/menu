@@ -9,7 +9,8 @@ from rest_framework.views import exception_handler
 from rest_framework_mongoengine.viewsets import ModelViewSet
 from .serializers import  ModifierSerializer, OptionsSerializer, OptionGroupSerializer, OrdersSerializer, StoresSerializer, \
     ItemsSerializer
-from .models import Modifiers, Options, OptionGroups, Items, Stores, Orders
+from .models import Modifiers, Options, OptionGroups, Items, Stores, OrderItems, Orders
+
 from rest_framework.decorators import api_view
 
 
