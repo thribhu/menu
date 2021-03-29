@@ -1,3 +1,5 @@
+from re import M
+from django.http import request
 from mongoengine import *
 from mongoengine import document
 
@@ -21,8 +23,10 @@ class ModOptions(EmbeddedDocument):
 class Modifiers(Document):
     name = StringField(max_length=1024, required=True)
     options = ListField(EmbeddedDocumentField('ModOptions'))
-    is_used = BooleanField(default=False)
-    is_used_counter = IntField(default=0)
+    used = IntField(default=0)
+    # adding meta dict will excepts the unknown field error raised by 
+    # mongoengine base document
+    meta = {"strict": False}
     def __str__(self) -> str:
         return self.name
 
@@ -33,19 +37,35 @@ class Options(Document):
     modifiers = ListField(ReferenceField('Modifiers'))
     image_url = StringField(max_length=1000) 
     type = StringField(max_length=100, blank=False)
-    is_used = BooleanField(default=False)
-    is_used_counter = IntField(default=0)
-
+    used = IntField(default=0)
+    meta = {'strict': False}
     def __unicode__(self):
         return self.name
     def __str__(self) -> str:
         return self.name
 
     @classmethod
-    def post_save(cls, sender, doc, **kwargs):
-        if 'created' in kwargs:
-            print(document)
-    
+    def pre_save(cls, sender, document, **kwargs):
+        print(document)
+        data = cls
+        print(cls)
+    def update_modifiers(self, req_modifiers, *args,  **kwargs):
+        modifiers = set(self.modifiers)
+        req_modifiers = set(req_modifiers)
+        #reduce the count for removed modifier
+        reduce_list = list(modifiers.difference(req_modifiers))
+        increase_list = list(req_modifiers.difference(modifiers)) 
+        if reduce_list is not None:
+            for id in reduce_list:
+               modifier = Modifiers.objects.find(id=id)
+               modifier.used -= 1
+               modifier.save()
+        
+        if increase_list is not None:
+            for id in increase_list:
+                modifier = Modifiers.objects.find(id = id)
+                modifier.used += 1
+                modifier.save()
 
 class OptionGroups(Document):
     name = StringField(max_length=100, required=True)
@@ -55,8 +75,7 @@ class OptionGroups(Document):
     price = FloatField()
     max_allowed = IntField()
     options = ListField(ReferenceField('Options'))
-    is_used = BooleanField(default=False)
-    is_used_counter = IntField(default=0)
+    used = IntField(min_value=0)
     
     def __str__ (self):
         return self.name
@@ -155,4 +174,4 @@ class Orders(Document):
 
 
 
-signals.post_save.connect(Options.post_save, sender=Options)
+signals.pre_save.connect(Options.pre_save, sender=Options)

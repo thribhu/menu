@@ -8,7 +8,7 @@ from rest_framework.parsers import JSONParser
 class ModifierSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = Modifiers
-        fields = ('id', 'name', 'options')
+        fields = "__all__"
         depth = 2
 class OptionsSerializer(MongoSerializer.DocumentSerializer):
     modifiers = ModifierSerializer(many=True, read_only=True)

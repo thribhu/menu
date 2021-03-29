@@ -12,7 +12,7 @@ class Options(Document):
     modifiers = ListField(ReferenceField("Modifiers"))
     image_url = StringField(max_length=1000) 
     type = StringField(max_length=100, blank=False)
-    is_used = IntField(default=0, min_value=0)
+    used = IntField(default=0, min_value=0)
     
 
     def __str__(self) -> str:
