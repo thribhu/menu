@@ -34,7 +34,7 @@ class Options(Document):
     name = StringField(max_length=100, required=True)
     description = StringField(max_length=1000, blank=True)
     price = FloatField(required=True)
-    modifiers = ListField(ReferenceField('Modifiers'))
+    modifiers = ListField(ReferenceField('Modifiers', reverse_delete_rule=DENY))
     image_url = StringField(max_length=1000) 
     type = StringField(max_length=100, blank=False)
     used = IntField(default=0)
@@ -45,10 +45,16 @@ class Options(Document):
         return self.name
 
     @classmethod
-    def pre_save(cls, sender, document, **kwargs):
-        print(document)
-        data = cls
-        print(cls)
+    def post_save(cls, sender, document, created=None, **kwargs):
+        if created:
+            modifiers = document["modifiers"]
+            for id in modifiers:
+                print(id)
+                _modifier = Modifiers.objects.find(id = id)
+                _modifier.used = _modifier +  1
+                _modifier.save()
+                '''
+                
     def update_modifiers(self, req_modifiers, *args,  **kwargs):
         modifiers = set(self.modifiers)
         req_modifiers = set(req_modifiers)
@@ -66,6 +72,7 @@ class Options(Document):
                 modifier = Modifiers.objects.find(id = id)
                 modifier.used += 1
                 modifier.save()
+                '''
 
 class OptionGroups(Document):
     name = StringField(max_length=100, required=True)
@@ -74,9 +81,9 @@ class OptionGroups(Document):
     min_required = IntField()
     price = FloatField()
     max_allowed = IntField()
-    options = ListField(ReferenceField('Options'))
+    options = ListField(ReferenceField('Options', reverse_delete_rule=DENY))
     used = IntField(min_value=0)
-    
+    meta = {"strict": False}
     def __str__ (self):
         return self.name
 
@@ -88,8 +95,8 @@ class Items(Document):
     price = FloatField()
     active = IntField()
     stock = IntField()
-    option_groups = ListField(ReferenceField("OptionGroups"))
-    options = ListField(ReferenceField("Options"))
+    option_groups = ListField(ReferenceField("OptionGroups", reverse_delete_rule=DENY))
+    options = ListField(ReferenceField("Options", reverse_delete_rule=DENY))
 
 
 class Address(EmbeddedDocument
@@ -174,4 +181,4 @@ class Orders(Document):
 
 
 
-signals.pre_save.connect(Options.pre_save, sender=Options)
+signals.post_save.connect(Options.post_save, sender=Options)
