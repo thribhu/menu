@@ -148,5 +148,10 @@ class OrdersViewSet(ModelViewSet):
             modifers = item.pop('modifiers', None)
             options = item.pop('options', None)
             option_groups = item.pop('option_groups', None)
+            order_item = OrderItems(**item)
+            order_item.save()
+            order_item.options = Options.objects.filter(id_in = options)
+            order_item.option_groups = OptionGroups.objects.filter(id_in = option_groups)
+            order_item.modifiers = Modifiers.objects.filter(id_in = modifers)
         return super().create(request, *args, **kwargs)
 
