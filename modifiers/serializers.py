@@ -2,7 +2,7 @@ import io
 from mongoengine import fields
 from rest_framework_mongoengine import serializers as MongoSerializer
 from rest_framework import serializers
-from .models import Modifiers, Options, OptionGroups, Items
+from .models import Customer, Modifiers, Options, OptionGroups, Items
 from rest_framework.parsers import JSONParser
     
 class ModifierSerializer(MongoSerializer.DocumentSerializer):
@@ -51,3 +51,8 @@ class OrdersSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = OptionGroups
         fields = '__all__'
+
+class CustomerSerializer(MongoSerializer.DocumentSerializer):
+    class Meta:
+        model = Customer
+        fields = "__all__"

@@ -1,4 +1,5 @@
 from re import M
+from typing import List
 from django.http import request
 from mongoengine import *
 from mongoengine import document
@@ -154,13 +155,14 @@ class Customer(Document):
     address = ListField(EmbeddedDocumentField(Address))
     phone = ListField(EmbeddedDocumentField(Phone))
     email = StringField(max_length=1000)
+    order_histort = ListField(ReferenceField("Orders"))
 
 class OrderItems(Document):
-    name = StringField(max_length=1000)
-    size = StringField(max_length=1000)
+    item = ReferenceField(Items)
     quantity = IntField()
     price = IntField()
-    side = StringField(max_length=1000)
+    modifiers = ListField(ReferenceField("Modifiers"))
+    option_groups = ListField(ReferenceError("OptionGroups"))
     options = ListField(ReferenceField("Options"))
 
 

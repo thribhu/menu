@@ -7,9 +7,9 @@ from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 from rest_framework_mongoengine.viewsets import ModelViewSet
-from .serializers import  ModifierSerializer, OptionsSerializer, OptionGroupSerializer, OrdersSerializer, StoresSerializer, \
+from .serializers import  CustomerSerializer, ModifierSerializer, OptionsSerializer, OptionGroupSerializer, OrdersSerializer, StoresSerializer, \
     ItemsSerializer
-from .models import Modifiers, Options, OptionGroups, Items, Stores, OrderItems, Orders
+from .models import Customer, Modifiers, Options, OptionGroups, Items, Stores, OrderItems, Orders
 
 from rest_framework.decorators import api_view
 
@@ -129,56 +129,24 @@ class StoresViewSet(ModelViewSet):
     queryset = Stores.objects.all()
     serializer_class = StoresSerializer
 
-    def post(self, update_data):
-        store_data = JSONParser().parse(request)
-        store_serializer = StoresSerializer(data=store_data)
-        if store_serializer.is_valid():
-            store_serializer.save()
-            return JsonResponse(store_serializer.validated_data, status=status.HTTP_201_CREATED)
-        return JsonResponse(store_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, update_data):
-        # do things...
-        store_update = Stores.objects.get(pk=update_data)
-        store_data = JSONParser().parse(request)
-        store_serializer = StoresSerializer(store_update, data=store_data)
-        if store_serializer.is_valid():
-            store_serializer.save()
-            return JsonResponse(store_serializer.data)
-        return JsonResponse(store_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, update_data):
-        group = Stores.objects.get(pk=update_data)
-        group.delete()
-        return JsonResponse({'message': 'Group was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
-
-
+class CustomersViewSet(ModelViewSet):
+    queryset = Customer.objects.all()
+    serializer_class = CustomerSerializer
 class OrdersViewSet(ModelViewSet):
     queryset = Orders.objects.all()
     serializer_class = OptionGroupSerializer
 
-    def post(self, update_data):
-        order_data = JSONParser().parse(request)
-        order_serializer = OrdersSerializer(data=order_data)
-        if order_serializer.is_valid():
-            order_serializer.save()
-            return JsonResponse(order_serializer.validated_data, status=status.HTTP_201_CREATED)
-        return JsonResponse(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def put(self, update_data):
-        # do things...
-        order_update = OptionGroups.objects.get(pk=update_data)
-        order_data = JSONParser().parse(request)
-        order_serializer = OrdersSerializer(order_update, data=order_data)
-        if order_serializer.is_valid():
-            order_serializer.save()
-            return JsonResponse(order_serializer.data)
-        return JsonResponse(order_serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, update_data):
-        order = Orders.objects.get(pk=update_data)
-        order.delete()
-        return JsonResponse({'message': 'Group was deleted successfully!'}, status=status.HTTP_204_NO_CONTENT)
-
-
+    def create(self, request, *args, **kwargs):
+        data = request.data
+        customer = data.pop('customer', None)
+        items = data.pop('items', None)
+        store = data.pop('store', None)
+        if not items:
+            raise ValueError('Items is required')
+        for item in items:
+            m_item = Items.objects.find(id = item.id)
+            modifers = item.pop('modifiers', None)
+            options = item.pop('options', None)
+            option_groups = item.pop('option_groups', None)
+        return super().create(request, *args, **kwargs)
 
