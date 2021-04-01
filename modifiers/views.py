@@ -5,6 +5,7 @@ from mongoengine.queryset.transform import update
 from rest_framework import status, permissions, generics
 from rest_framework.mixins import UpdateModelMixin
 from rest_framework.parsers import JSONParser
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 from rest_framework_mongoengine.viewsets import ModelViewSet
@@ -174,4 +175,18 @@ class OrdersViewSet(ModelViewSet):
             for option in options:
                 op = Options.objects.get(id = option.id)
                 name = op.name
+
+#get list options and groups in single call
+@api_view(["GET"])
+def get_list_options_groups(request, *args, **kwargs):
+    options = Options.objects.all()
+    groups = OptionGroups.objects.all()
+    res = []
+    option_serializer = OptionsSerializer(options, many=True)
+    group_serializer = OptionGroupSerializer(groups, many=True)
+    print(option_serializer.data)
+    res.append(option_serializer.data)
+    res.append(group_serializer.data)
+    context = {"data": res}
+    return Response(context, status=status.HTTP_200_OK)
 
