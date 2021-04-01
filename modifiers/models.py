@@ -24,7 +24,6 @@ class ModOptions(EmbeddedDocument):
 class Modifiers(Document):
     name = StringField(max_length=1024, required=True)
     options = ListField(EmbeddedDocumentField('ModOptions'))
-    used = IntField(default=0)
     # adding meta dict will excepts the unknown field error raised by 
     # mongoengine base document
     meta = {"strict": False}
@@ -33,12 +32,11 @@ class Modifiers(Document):
 
 class Options(Document):
     name = StringField(max_length=100, required=True)
-    description = StringField(max_length=1000, blank=True)
+    description = StringField(max_length=1000, default="")
     price = FloatField(required=True)
     modifiers = ListField(ReferenceField('Modifiers', reverse_delete_rule=DENY))
-    image_url = StringField(max_length=1000) 
-    type = StringField(max_length=100, blank=False)
-    used = IntField(default=0)
+    image_url = StringField(max_length=1000, default="") 
+    type = StringField(max_length=100, default="")
     meta = {'strict': False}
     def __unicode__(self):
         return self.name
@@ -54,45 +52,23 @@ class Options(Document):
                 _modifier = Modifiers.objects.find(id = id)
                 _modifier.used = _modifier +  1
                 _modifier.save()
-                '''
-                
-    def update_modifiers(self, req_modifiers, *args,  **kwargs):
-        modifiers = set(self.modifiers)
-        req_modifiers = set(req_modifiers)
-        #reduce the count for removed modifier
-        reduce_list = list(modifiers.difference(req_modifiers))
-        increase_list = list(req_modifiers.difference(modifiers)) 
-        if reduce_list is not None:
-            for id in reduce_list:
-               modifier = Modifiers.objects.find(id=id)
-               modifier.used -= 1
-               modifier.save()
-        
-        if increase_list is not None:
-            for id in increase_list:
-                modifier = Modifiers.objects.find(id = id)
-                modifier.used += 1
-                modifier.save()
-                '''
-
 class OptionGroups(Document):
     name = StringField(max_length=100, required=True)
-    description = StringField(max_length=1000, default=None)
+    description = StringField(max_length=1000, default="")
     order = IntField()
     min_required = IntField()
     price = FloatField()
     max_allowed = IntField()
     options = ListField(ReferenceField('Options', reverse_delete_rule=DENY))
-    used = IntField(min_value=0)
     meta = {"strict": False}
     def __str__ (self):
         return self.name
 
 class Items(Document):
     name = StringField(max_length=100, required=True)
-    description = StringField(max_length=1000)
-    type = StringField(max_length=1000)
-    image_url = StringField(max_length=1000) # File to e sent
+    description = StringField(max_length=1000, default="")
+    type = StringField(max_length=1000, default="")
+    image_url = StringField(max_length=1000, default="") # File to e sent
     price = FloatField()
     active = IntField()
     stock = IntField()
@@ -102,7 +78,7 @@ class Items(Document):
 
 class Address(EmbeddedDocument
 ):
-    address1 = StringField(max_length=100, required=True)
+    address1 = StringField(max_length=100, required=True) ,
     apt_bldg = StringField(max_length=1000)
     city = StringField(max_length=1000)
     state = StringField(max_length=100)

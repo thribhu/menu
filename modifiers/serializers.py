@@ -37,12 +37,7 @@ class ItemsSerializer(MongoSerializer.DocumentSerializer):
         option_groups = OptionGroupSerializer(many=True, read_only=True)
         class Meta:
             model = Items
-            fields = [
-                "id",
-                "options",
-                "option_groups",
-                "name"
-            ] 
+            fields = "__all__"
 class StoresSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = OptionGroups
