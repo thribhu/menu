@@ -115,7 +115,7 @@ class ItemsViewSet(ModelViewSet):
             item.option_groups = update_list
         item.save()
         serializer = ItemsSerializer(item)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response(serializer.data, status=status.HTTP_201_CREATED)
     def update(self, request, *args, **kwargs):
         item_instance = self.get_object()
         item = request.data
@@ -181,12 +181,11 @@ class OrdersViewSet(ModelViewSet):
 def get_list_options_groups(request, *args, **kwargs):
     options = Options.objects.all()
     groups = OptionGroups.objects.all()
-    res = []
     option_serializer = OptionsSerializer(options, many=True)
     group_serializer = OptionGroupSerializer(groups, many=True)
     print(option_serializer.data)
-    res.append(option_serializer.data)
-    res.append(group_serializer.data)
+    res = option_serializer.data
+    res = res + group_serializer.data
     context = {"data": res}
     return Response(context, status=status.HTTP_200_OK)
 
