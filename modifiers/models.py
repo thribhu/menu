@@ -1,3 +1,4 @@
+from enum import unique
 from re import M
 from typing import List
 from django.http import request
@@ -5,8 +6,8 @@ from mongoengine import *
 from mongoengine import document
 
 from mongoengine.document import Document, EmbeddedDocument
-from mongoengine.fields import BooleanField, EmbeddedDocumentField, FloatField, IntField, ListField, StringField, \
-    ReferenceField
+from mongoengine.fields import BooleanField, EmbeddedDocumentField, FloatField, ImageField, IntField, ListField, StringField, \
+    ReferenceField, URLField
 # from django.db import models
 # from django.contrib.postgres.fields import JSONField
 #
@@ -22,7 +23,7 @@ class ModOptions(EmbeddedDocument):
 
 
 class Modifiers(Document):
-    name = StringField(max_length=1024, required=True)
+    name = StringField(max_length=1024, required=True, unique=True)
     options = ListField(EmbeddedDocumentField('ModOptions'))
     # adding meta dict will excepts the unknown field error raised by 
     # mongoengine base document
@@ -31,11 +32,11 @@ class Modifiers(Document):
         return self.name
 
 class Options(Document):
-    name = StringField(max_length=100, required=True)
+    name = StringField(max_length=100, required=True, unique=True)
     description = StringField(max_length=1000, default="")
     price = FloatField(required=True)
     modifiers = ListField(ReferenceField('Modifiers', reverse_delete_rule=DENY))
-    image_url = StringField(max_length=1000, default="") 
+    image_url = StringField() 
     type = StringField(max_length=100, default="")
     meta = {'strict': False}
     def __unicode__(self):
@@ -43,17 +44,8 @@ class Options(Document):
     def __str__(self) -> str:
         return self.name
 
-    @classmethod
-    def post_save(cls, sender, document, created=None, **kwargs):
-        if created:
-            modifiers = document["modifiers"]
-            for id in modifiers:
-                print(id)
-                _modifier = Modifiers.objects.find(id = id)
-                _modifier.used = _modifier +  1
-                _modifier.save()
 class OptionGroups(Document):
-    name = StringField(max_length=100, required=True)
+    name = StringField(max_length=100, required=True, unique=True)
     description = StringField(max_length=1000, default="")
     order = IntField()
     min_required = IntField()
@@ -65,7 +57,7 @@ class OptionGroups(Document):
         return self.name
 
 class Items(Document):
-    name = StringField(max_length=100, required=True)
+    name = StringField(max_length=100, required=True, unique=True)
     description = StringField(max_length=1000, default="")
     type = StringField(max_length=1000, default="")
     image_url = StringField(max_length=1000, default="") # File to e sent
@@ -134,13 +126,10 @@ class Customer(Document):
     order_histort = ListField(ReferenceField("Orders"))
 
 class OrderItems(Document):
-    item = ReferenceField(Items)
-    quantity = IntField()
+    name = StringField(max_length=1000)
     price = IntField()
-    modifiers = ListField(ReferenceField("Modifiers"))
-    option_groups = ListField(ReferenceError("OptionGroups"))
-    options = ListField(ReferenceField("Options"))
-
+    qty = IntField()    
+    meta = {'strict': False}
 
 class Orders(Document):
     number = StringField(max_length=1000)
@@ -156,7 +145,3 @@ class Orders(Document):
     total_price = IntField()
     items = ListField(ReferenceField(OrderItems))
 
-
-
-
-signals.post_save.connect(Options.post_save, sender=Options)

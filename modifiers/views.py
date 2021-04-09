@@ -9,6 +9,7 @@ from rest_framework.decorators import api_view
 from rest_framework.response import Response
 from rest_framework.views import exception_handler
 from rest_framework_mongoengine.viewsets import ModelViewSet
+from rest_framework.parsers import MultiPartParser, FormParser
 from .serializers import  CustomerSerializer, ModifierSerializer, OptionsSerializer, OptionGroupSerializer, OrdersSerializer, StoresSerializer, \
     ItemsSerializer
 from .models import Customer, Modifiers, Options, OptionGroups, Items, Stores, OrderItems, Orders
@@ -21,12 +22,14 @@ class ModifierViewSet(ModelViewSet):
     serializer_class = ModifierSerializer
     
 class OptionsViewSet(ModelViewSet):
+    #parser_classes = (MultiPartParser, FormParser)
     serializer_class=OptionsSerializer
     def get_queryset(self):
         option_data = Options.objects.all()
         return option_data
     def create(self, request, *args, **kwargs):
         data = request.data
+        print(data)
         modifiers = data.pop("modifiers", None)
         option = Options(**data)
         option.save()
