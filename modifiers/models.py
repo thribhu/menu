@@ -31,6 +31,10 @@ class Modifiers(Document):
     def __str__(self) -> str:
         return self.name
 
+    def clean(self):
+        self.name = self.name.capitalize()
+        return super().clean()
+
 class Options(Document):
     name = StringField(max_length=100, required=True, unique=True)
     description = StringField(max_length=1000, default="")
@@ -43,6 +47,9 @@ class Options(Document):
         return self.name
     def __str__(self) -> str:
         return self.name
+    def clean(self):
+        self.name = self.name.capitalize()
+        return super().clean()
 
 class OptionGroups(Document):
     name = StringField(max_length=100, required=True, unique=True)
@@ -55,6 +62,9 @@ class OptionGroups(Document):
     meta = {"strict": False}
     def __str__ (self):
         return self.name
+    def clean(self):
+        self.name = self.name.capitalize()
+        return super().clean()
 
 class Items(Document):
     name = StringField(max_length=100, required=True, unique=True)
@@ -67,6 +77,9 @@ class Items(Document):
     option_groups = ListField(ReferenceField("OptionGroups", reverse_delete_rule=DENY))
     options = ListField(ReferenceField("Options", reverse_delete_rule=DENY))
 
+    def clean(self):
+        self.name = self.name.capitalize()
+        return super().clean()
 
 class Address(EmbeddedDocument
 ):

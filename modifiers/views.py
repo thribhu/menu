@@ -192,3 +192,11 @@ def get_list_options_groups(request, *args, **kwargs):
     context = {"data": res}
     return Response(context, status=status.HTTP_200_OK)
 
+@api_view(["POST"])
+def upload_many_options(request, *args, **kwargs):
+    options_list = request.data
+    print(options_list)
+    options = [Options(**opt) for opt in options_list]
+    Options.objects.bulk_create(options)
+    serializer = OptionsSerializer(options, many=True)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
