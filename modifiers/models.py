@@ -1,13 +1,8 @@
-from enum import unique
-from re import M
-from typing import List
-from django.http import request
 from mongoengine import *
-from mongoengine import document
 
 from mongoengine.document import Document, EmbeddedDocument
 from mongoengine.fields import BooleanField, EmbeddedDocumentField, FloatField, ImageField, IntField, ListField, StringField, \
-    ReferenceField, URLField
+    ReferenceField
 # from django.db import models
 # from django.contrib.postgres.fields import JSONField
 #
