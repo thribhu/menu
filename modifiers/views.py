@@ -144,6 +144,8 @@ class ItemsViewSet(ModelViewSet):
                 _group = OptionGroups.objects.get(id = group)
                 update_list.append(_group)
             item_instance.option_groups = update_list
+        else:
+            item_instance.option_groups = list()
         item_instance.save()
         serializer = ItemsSerializer( item_instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
