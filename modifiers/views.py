@@ -147,7 +147,7 @@ class ItemsViewSet(ModelViewSet):
         else:
             item_instance.option_groups = list()
         item_instance.save()
-        serializer = ItemsSerializer( item_instance)
+        serializer = ItemsSerializer(item_instance)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
