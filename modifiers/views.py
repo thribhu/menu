@@ -37,9 +37,8 @@ class OptionsViewSet(ModelViewSet):
             u_modifiers = []
             for id in modifiers:
                 u_modifiers.append(Modifiers.objects.get(pk=id))
-        option.modifiers = u_modifiers
-        print(u_modifiers)
-        option.save()
+            option.modifiers = u_modifiers
+            option.save()
         serializer = OptionsSerializer(option)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
     def update(self, request, *args, **kwargs):
@@ -52,6 +51,7 @@ class OptionsViewSet(ModelViewSet):
         option.modifiers = u_modifiers
         option.name = data["name"] or option.name
         option.type = data["type"] or option.type
+        option.price = data["price"] or option.price
         option.description = data["description"] or option.description
         option.image_url = data["image_url"] or option.image_url
         option.save()
