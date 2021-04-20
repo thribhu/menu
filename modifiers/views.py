@@ -29,7 +29,7 @@ class OptionsViewSet(ModelViewSet):
         return option_data
     def create(self, request, *args, **kwargs):
         data = request.data
-        print(data)
+        image = request.data['file']
         modifiers = data.pop("modifiers", None)
         option = Options(**data)
         option.save()

@@ -35,7 +35,7 @@ class Options(Document):
     description = StringField(max_length=1000, default="")
     price = FloatField(required=True)
     modifiers = ListField(ReferenceField('Modifiers', reverse_delete_rule=DENY))
-    image_url = StringField() 
+    image_url = ImageField(thumbnail_size=(200,200, True))  
     type = StringField(max_length=100, default="")
     meta = {'strict': False}
     def __unicode__(self):

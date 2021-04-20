@@ -12,9 +12,13 @@ class ModifierSerializer(MongoSerializer.DocumentSerializer):
         depth = 2
 class OptionsSerializer(MongoSerializer.DocumentSerializer):
     modifiers = ModifierSerializer(many=True, read_only=True)
+    image_url = serializers.ImageField()
     class Meta:
         model = Options
-        fields = "__all__"
+        fields = [
+            'id',
+            'name', 'price', 'description', 'modifiers', 'image_url','type'
+        ] 
     def to_representation(self, instance):
         data = super().to_representation(instance)
         if not data['description']:
