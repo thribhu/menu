@@ -12,7 +12,7 @@ class ModifierSerializer(MongoSerializer.DocumentSerializer):
         depth = 2
 class OptionsSerializer(MongoSerializer.DocumentSerializer):
     modifiers = ModifierSerializer(many=True, read_only=True)
-    image_url = serializers.ImageField()
+    image_url = serializers.ImageField(use_url=True)
     class Meta:
         model = Options
         fields = [
