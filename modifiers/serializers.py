@@ -124,3 +124,12 @@ class FileUploadSerializer(MongoSerializer.DocumentSerializer):
             instance.location = path  # saving location to DB
             instance.save()
         return instance
+
+    def delete(self):
+        if not self.instance:
+            raise ValueError("'instance' attribute must not be None")
+
+        self.storage_file_delete()  # remove from default storage
+        self.instance.file.delete()  # deleting GridFS doc
+        self.instance.save()  # changes saving back to DB
+        self.instance.delete()
