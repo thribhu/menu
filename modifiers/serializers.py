@@ -2,7 +2,9 @@ import io
 from mongoengine import fields
 from rest_framework_mongoengine import serializers as MongoSerializer
 from rest_framework import serializers
-from .models import Customer, Modifiers, Options, OptionGroups, Items, OrderItems
+from .models import (
+    Customer, Modifiers, Options, OptionGroups, Items, OrderItems, FileUpload
+)
 from rest_framework.parsers import JSONParser
     
 class ModifierSerializer(MongoSerializer.DocumentSerializer):
@@ -54,4 +56,10 @@ class CustomerSerializer(MongoSerializer.DocumentSerializer):
 class OrderItemsSerializer(MongoSerializer.DocumentSerializer):
     class Meta:
         model = OrderItems
+        fields = "__all__"
+
+
+class FileUploadSerializer(MongoSerializer.DocumentSerializer):
+    class Meta:
+        model = FileUpload
         fields = "__all__"

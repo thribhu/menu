@@ -10,9 +10,14 @@ from rest_framework.response import Response
 from rest_framework.views import exception_handler
 from rest_framework_mongoengine.viewsets import ModelViewSet
 from rest_framework.parsers import MultiPartParser, FormParser
-from .serializers import  CustomerSerializer, ModifierSerializer, OptionsSerializer, OptionGroupSerializer, OrdersSerializer, StoresSerializer, \
-    ItemsSerializer
-from .models import Customer, Modifiers, Options, OptionGroups, Items, Stores, OrderItems, Orders
+from .serializers import (
+    CustomerSerializer, ModifierSerializer, OptionsSerializer, OptionGroupSerializer,
+    OrdersSerializer, StoresSerializer, ItemsSerializer, FileUploadSerializer
+)
+from .models import (
+    Customer, Modifiers, Options, OptionGroups, Items, Stores, OrderItems,
+    Orders, FileUpload
+)
 
 from rest_framework.decorators import api_view
 
@@ -202,3 +207,8 @@ def upload_many_options(request, *args, **kwargs):
     Options.objects.bulk_create(options)
     serializer = OptionsSerializer(options, many=True)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class FileUploadViewSet(ModelViewSet):
+    queryset = FileUpload.objects.all()
+    serializer_class = FileUploadSerializer
