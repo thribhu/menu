@@ -155,4 +155,5 @@ class Orders(Document):
 
 
 class FileUpload(Document):
+    location = StringField(default="")
     file = FileField()
