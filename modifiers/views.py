@@ -10,9 +10,14 @@ from rest_framework.response import Response
 from rest_framework.views import exception_handler
 from rest_framework_mongoengine.viewsets import ModelViewSet
 from rest_framework.parsers import MultiPartParser, FormParser
-from .serializers import  CustomerSerializer, ModifierSerializer, OptionsSerializer, OptionGroupSerializer, OrdersSerializer, StoresSerializer, \
-    ItemsSerializer
-from .models import Customer, Modifiers, Options, OptionGroups, Items, Stores, OrderItems, Orders
+from .serializers import (
+    CustomerSerializer, ModifierSerializer, OptionsSerializer, OptionGroupSerializer,
+    OrdersSerializer, StoresSerializer, ItemsSerializer, FileUploadSerializer
+)
+from .models import (
+    Customer, Modifiers, Options, OptionGroups, Items, Stores, OrderItems,
+    Orders, FileUpload
+)
 
 from rest_framework.decorators import api_view
 
@@ -20,13 +25,16 @@ from rest_framework.decorators import api_view
 class ModifierViewSet(ModelViewSet):
     queryset = Modifiers.objects.all()
     serializer_class = ModifierSerializer
-    
+
+
 class OptionsViewSet(ModelViewSet):
-    #parser_classes = (MultiPartParser, FormParser)
-    serializer_class=OptionsSerializer
+    # parser_classes = (MultiPartParser, FormParser)
+    serializer_class = OptionsSerializer
+
     def get_queryset(self):
         option_data = Options.objects.all()
         return option_data
+
     def create(self, request, *args, **kwargs):
         data = request.data
         print(data)
@@ -41,6 +49,7 @@ class OptionsViewSet(ModelViewSet):
             option.save()
         serializer = OptionsSerializer(option)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     def update(self, request, *args, **kwargs):
         option = self.get_object()
         data = request.data
@@ -57,24 +66,29 @@ class OptionsViewSet(ModelViewSet):
         option.save()
         serializer = OptionsSerializer(option)
         return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class OptionGroupViewSet(ModelViewSet):
     serializer_class = OptionGroupSerializer
+
     def get_queryset(self):
         groups = OptionGroups.objects.all()
         return groups
+
     def create(self, request, *args, **kwargs):
         data = request.data
         options = data.pop("options", None)
         group = OptionGroups(**data)
         group.save()
         if options is not None:
-           u_options = [] 
-           for id in options:
-               u_options.append(Options.objects.get(id=id))
-               group.options = u_options
-               group.save()
+            u_options = []
+            for id in options:
+                u_options.append(Options.objects.get(id=id))
+                group.options = u_options
+                group.save()
         serializer = OptionGroupSerializer(group)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     def update(self, request, *args, **kwargs):
         group = self.get_object()
         data = request.data
@@ -90,13 +104,17 @@ class OptionGroupViewSet(ModelViewSet):
         group.options = options_list
         group.save()
         serializer = OptionGroupSerializer(group)
-        return Response(serializer.data, status=status.HTTP_200_OK) 
+        return Response(serializer.data, status=status.HTTP_200_OK)
+
+
 class ItemsViewSet(ModelViewSet):
     queryset = Items.objects.all()
     serializer_class = ItemsSerializer
+
     def get_queryset(self):
         items = Items.objects.all()
         return items
+
     def create(self, request):
         data = request.data
         print(data)
@@ -107,18 +125,19 @@ class ItemsViewSet(ModelViewSet):
         if options:
             update_list = []
             for option in options:
-                _option = Options.objects.get(id = option)
+                _option = Options.objects.get(id=option)
                 update_list.append(_option)
             item.options = update_list
         if groups:
             update_list = []
             for group in groups:
-                _group = OptionGroups.objects.get(id = group)
+                _group = OptionGroups.objects.get(id=group)
                 update_list.append(_group)
             item.option_groups = update_list
         item.save()
         serializer = ItemsSerializer(item)
         return Response(serializer.data, status=status.HTTP_201_CREATED)
+
     def update(self, request, *args, **kwargs):
         item_instance = self.get_object()
         item = request.data
@@ -135,13 +154,13 @@ class ItemsViewSet(ModelViewSet):
         if options:
             update_list = []
             for option in options:
-                _option = Options.objects.get(id = option)
+                _option = Options.objects.get(id=option)
                 update_list.append(_option)
             item_instance.options = update_list
         if groups:
             update_list = []
             for group in groups:
-                _group = OptionGroups.objects.get(id = group)
+                _group = OptionGroups.objects.get(id=group)
                 update_list.append(_group)
             item_instance.option_groups = update_list
         else:
@@ -155,9 +174,12 @@ class StoresViewSet(ModelViewSet):
     queryset = Stores.objects.all()
     serializer_class = StoresSerializer
 
+
 class CustomersViewSet(ModelViewSet):
     queryset = Customer.objects.all()
     serializer_class = CustomerSerializer
+
+
 class OrdersViewSet(ModelViewSet):
     queryset = Orders.objects.all()
     serializer_class = OptionGroupSerializer
@@ -170,7 +192,7 @@ class OrdersViewSet(ModelViewSet):
         if not items:
             raise ValueError('Items is required')
         for item in items:
-            m_item = Items.objects.get(id = item.id)
+            m_item = Items.objects.get(id=item.id)
             options = item.pop('options', None)
             option_groups = item.pop('option_groups', None)
             modifiers = items.pop('modifers', None)
@@ -178,10 +200,11 @@ class OrdersViewSet(ModelViewSet):
             item_groups = []
             item_modifiers = []
             for option in options:
-                op = Options.objects.get(id = option.id)
+                op = Options.objects.get(id=option.id)
                 name = op.name
 
-#get list options and groups in single call
+
+# get list options and groups in single call
 @api_view(["GET"])
 def get_list_options_groups(request, *args, **kwargs):
     options = Options.objects.all()
@@ -194,6 +217,7 @@ def get_list_options_groups(request, *args, **kwargs):
     context = {"data": res}
     return Response(context, status=status.HTTP_200_OK)
 
+
 @api_view(["POST"])
 def upload_many_options(request, *args, **kwargs):
     options_list = request.data
@@ -202,3 +226,12 @@ def upload_many_options(request, *args, **kwargs):
     Options.objects.bulk_create(options)
     serializer = OptionsSerializer(options, many=True)
     return Response(serializer.data, status=status.HTTP_201_CREATED)
+
+
+class FileUploadViewSet(ModelViewSet):
+    queryset = FileUpload.objects.all()
+    serializer_class = FileUploadSerializer
+
+    def perform_destroy(self, instance):
+        serializer = self.serializer_class(instance=instance)
+        serializer.delete()
