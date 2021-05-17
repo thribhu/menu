@@ -80,9 +80,24 @@ class OrderItemsSerializer(MongoSerializer.DocumentSerializer):
 
 
 class FileUploadSerializer(MongoSerializer.DocumentSerializer):
+    location = serializers.CharField(write_only=True, required=False)
+    url = serializers.SerializerMethodField()
     class Meta:
         model = FileUpload
         fields = "__all__"
+
+    def get_url(self, file_instance):
+        request = self.context["request"]
+        rel_path = f"{settings.MEDIA_URL}{file_instance.location}"
+        return request.build_absolute_uri(rel_path)
+
+    def validate_location(self, location):
+        if "/" == location[0]:
+            location = location[1:]
+        if "/" == location[-1]:
+            location = location[:-1]
+
+        return location
 
     def get_mongo_file_args(self):
         uploaded_file = self.validated_data["file"]
@@ -96,8 +111,14 @@ class FileUploadSerializer(MongoSerializer.DocumentSerializer):
         }
 
     def get_file_save_args(self):
+        rel_path = ""
+        location = self.validated_data.get("location", "")
+        if location:
+            rel_path = f"{location}/"
+
         uploaded_file = self.validated_data["file"]
-        return uploaded_file.name, uploaded_file.file
+        dest = f"{rel_path}{uploaded_file.name}"
+        return dest, uploaded_file.file
 
     def storage_file_store(self):
         return default_storage.save(*self.get_file_save_args())
