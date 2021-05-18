@@ -35,7 +35,7 @@ class Options(Document):
     description = StringField(max_length=1000, default="")
     price = FloatField(required=True)
     modifiers = ListField(ReferenceField('Modifiers', reverse_delete_rule=DENY))
-    image_url = StringField() 
+    image_url = StringField()
     type = StringField(max_length=100, default="")
     meta = {'strict': False}
     def __unicode__(self):
@@ -136,7 +136,7 @@ class Customer(Document):
 class OrderItems(Document):
     name = StringField(max_length=1000)
     price = IntField()
-    qty = IntField()    
+    qty = IntField()
     meta = {'strict': False}
 
 class Orders(Document):
@@ -153,3 +153,7 @@ class Orders(Document):
     total_price = IntField()
     items = ListField(ReferenceField(OrderItems))
 
+
+class FileUpload(Document):
+    location = StringField(default="")
+    file = FileField()

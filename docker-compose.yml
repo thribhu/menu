@@ -1,0 +1,23 @@
+version: '3.8'
+
+services:
+  web:
+    build:
+      context: .
+    volumes:
+      - .:/code
+    command: python manage.py runserver 0.0.0.0:8000
+    container_name: django_web
+    ports:
+      - 8000:8000
+    environment:
+      - DATABASE_URL=mongodb://db:27017/menubuilder
+
+  db:
+    image: mongo:4.4
+    container_name: django_mongodb
+    volumes:
+      - django_mongodb_data:/data/db
+
+volumes:
+  django_mongodb_data:

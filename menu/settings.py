@@ -13,7 +13,13 @@ https://docs.djangoproject.com/en/3.1/ref/settings/
 import os
 from pathlib import Path
 from mongoengine import connect
-connect('menubuilder')
+
+# https://docs.mongoengine.org/guide/connecting.html#connect-with-uri-string
+DATABASE_URL = os.environ.get(
+    "DATABASE_URL",
+    "mongodb://127.0.0.1:27017/menubuilder"
+)
+connect(host=DATABASE_URL)
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
