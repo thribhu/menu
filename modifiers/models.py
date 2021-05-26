@@ -9,7 +9,7 @@ from mongoengine.fields import BooleanField, EmbeddedDocumentField, FloatField, 
 # from rest_framework import serializers, viewsets, response
 
 '''
-Signal: To increate the count of referenced model, signal will trigger after post_save
+Signal: To increase the count of referenced model, signal will trigger after post_save
 '''
 from mongoengine import signals
 class ModOptions(EmbeddedDocument):
